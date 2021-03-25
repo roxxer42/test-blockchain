@@ -140,3 +140,9 @@ class Blockchain:
         :return: All blocks of the blockchain
         """
         return self.chain
+
+    def get_block_by_index(self, index):
+        """
+        :return: A specific block of the blockchain by an index
+        """
+        return self.chain[index]

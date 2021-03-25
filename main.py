@@ -17,3 +17,6 @@ if __name__ == '__main__':
 
     balance_sender = blockchain.get_balance_for_address(sender.public_key)
     print(balance_sender)
+
+    print(blockchain.get_block_by_index(0).hash)
+    print(blockchain.get_block_by_index(1).previous_hash)
