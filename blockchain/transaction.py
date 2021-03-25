@@ -41,6 +41,11 @@ class Transaction:
         except (ValueError, TypeError):
             return False
 
+    def check_if_transaction_is_valid(self):
+        if self.signature is None:
+            return False
+        return self.verify_transaction()
+
     def hash_transaction(self):
         """
         Hashes a transaction for mining a block

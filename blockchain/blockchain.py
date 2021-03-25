@@ -60,13 +60,8 @@ class Blockchain:
         Adds a transaction to the opened transactions
         :param transaction: Transaction which will be added to the unprocessed transactions
         """
-        if self.check_if_transaction_is_valid(transaction):
+        if transaction.check_if_transaction_is_valid():
             self.open_transactions.append(transaction)
-
-    def check_if_transaction_is_valid(self, transaction: Transaction):
-        if transaction.signature is None:
-            return False
-        return transaction.verify_transaction()
 
     def hash_transactions(self, transactions: [Transaction]):
         """
