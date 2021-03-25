@@ -108,3 +108,30 @@ class TestBlockchain(TestCase):
         self.assertEqual(last_block.previous_hash, middle_block_hash)
         self.assertEqual(len(last_block.transactions), 2)
         self.assertEqual(len(self.test_blockchain.chain), 3)
+
+    def test_balance_of_address(self):
+        test_user_1 = Client()
+        test_user_2 = Client()
+        test_user_3 = Client()
+
+        new_transaction_1 = Transaction(test_user_1.public_key, test_user_2.public_key, 100)
+        new_transaction_1.sign_transaction(test_user_1.private_key)
+
+        new_transaction_2 = Transaction(test_user_1.public_key, test_user_2.public_key, 10)
+        new_transaction_2.sign_transaction(test_user_1.private_key)
+
+        new_transaction_3 = Transaction(test_user_2.public_key, test_user_3.public_key, 50)
+        new_transaction_3.sign_transaction(test_user_2.private_key)
+
+        new_transaction_4 = Transaction(test_user_3.public_key, test_user_1.public_key, 20)
+        new_transaction_4.sign_transaction(test_user_3.private_key)
+
+        self.test_blockchain.add_new_transaction(new_transaction_1)
+        self.test_blockchain.add_new_transaction(new_transaction_2)
+        self.test_blockchain.add_new_transaction(new_transaction_3)
+        self.test_blockchain.add_new_transaction(new_transaction_4)
+        self.test_blockchain.mine_block()
+
+        self.assertEqual(self.test_blockchain.get_balance_for_address(test_user_1.public_key), -90)
+        self.assertEqual(self.test_blockchain.get_balance_for_address(test_user_2.public_key), 60)
+        self.assertEqual(self.test_blockchain.get_balance_for_address(test_user_3.public_key), 30)

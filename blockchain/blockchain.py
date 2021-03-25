@@ -1,6 +1,8 @@
 import hashlib
 import json
 
+from Crypto.PublicKey.RSA import RsaKey
+
 from blockchain.block import Block
 from blockchain.client import Client
 from blockchain.transaction import Transaction
@@ -39,13 +41,6 @@ class Blockchain:
             [initial_transaction],
             genesis_block_nonce)
         self.chain.append(genesis_block)
-
-    @property
-    def get_last_block(self):
-        """
-        :return: Last block of the blockchain
-        """
-        return self.chain[-1]
 
     def add_block_to_chain(self, new_block: Block):
         """
@@ -113,3 +108,35 @@ class Blockchain:
             computed_hash = block.hash_block()
         block.hash = computed_hash
         return block.nonce
+
+    def get_balance_for_address(self, public_key: RsaKey):
+        """
+        Calculates the balance for a specific address.
+        Be careful with the runtime O(n^2).
+        :param public_key: The address for checking the balance
+        :return: Balance of the given address
+        :rtype: int
+        """
+        balance = 0
+        for block in self.chain:
+            for tx in block.transactions:
+                amount = tx.amount
+                if tx.recipient == public_key:
+                    balance += amount
+                if tx.sender == public_key:
+                    balance -= amount
+        return balance
+
+    @property
+    def get_last_block(self):
+        """
+        :return: Last block of the blockchain
+        """
+        return self.chain[-1]
+
+    @property
+    def get_full_blockchain(self):
+        """
+        :return: All blocks of the blockchain
+        """
+        return self.chain
