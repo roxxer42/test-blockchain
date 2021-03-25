@@ -90,6 +90,7 @@ class TestBlockchain(TestCase):
         self.assertEqual(middle_block.index, 1)
         self.assertEqual(len(middle_block.transactions), 1)
         self.assertEqual(len(self.test_blockchain.open_transactions), 0)
+        self.assertTrue(middle_block.timestamp > gen_block.timestamp)
 
         # second block after gensis
         test_user_1 = Client()
@@ -108,6 +109,7 @@ class TestBlockchain(TestCase):
         self.assertEqual(last_block.previous_hash, middle_block_hash)
         self.assertEqual(len(last_block.transactions), 2)
         self.assertEqual(len(self.test_blockchain.chain), 3)
+        self.assertTrue(last_block.timestamp > middle_block.timestamp)
 
     def test_balance_of_address(self):
         test_user_1 = Client()

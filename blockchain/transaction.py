@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from Crypto.Hash import SHA256
 from Crypto.PublicKey.RSA import RsaKey
 from Crypto.Signature import pkcs1_15
@@ -16,6 +18,7 @@ class Transaction:
         self.recipient = recipient
         self.signature = None
         self.amount = amount
+        self.timestamp = datetime.now()
 
     def encoded_transaction(self):
         return (str(self.sender) + str(self.recipient) + str(self.amount)).encode('utf-8')

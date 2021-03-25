@@ -1,4 +1,5 @@
 import hashlib
+from datetime import datetime
 
 from blockchain.transaction import Transaction
 
@@ -12,6 +13,7 @@ class Block:
         self.transactions = transactions
         self.nonce = nonce
         self.hash = self.hash_block()
+        self.timestamp = datetime.now()
 
     def hash_block(self):
         """
