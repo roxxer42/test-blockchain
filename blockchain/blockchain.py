@@ -1,0 +1,120 @@
+import hashlib
+import json
+
+from blockchain.block import Block
+from blockchain.client import Client
+from blockchain.transaction import Transaction
+
+
+class Blockchain:
+
+    def __init__(self):
+        self.open_transactions = []
+        self.chain = []
+        self.create_genesis_bock(sender=Client(), recipient=Client())
+
+    def create_genesis_bock(self, sender: Client, recipient: Client):
+        """
+        Creates a genesis block which will be the first block of the blockchain
+        """
+        # First index
+        genesis_block_index = 0
+        # There is no previous block so this hash is just a dummy
+        genesis_block_prev_hash = "0000000000000000000000000000000000000000000000000000000000000000"
+
+        # Initial transaction because there have to be at least one transaction per block
+        genesis_send_user = sender
+        genesis_receive_user = recipient
+        initial_transaction = Transaction(genesis_send_user.public_key, genesis_receive_user.public_key, 100)
+        initial_transaction.sign_transaction(genesis_send_user.private_key)
+        hashed_transactions = self.hash_transactions([initial_transaction])
+
+        # Initial nonce
+        genesis_block_nonce = 0
+
+        genesis_block = Block(
+            genesis_block_index,
+            genesis_block_prev_hash,
+            hashed_transactions,
+            [initial_transaction],
+            genesis_block_nonce)
+        self.chain.append(genesis_block)
+
+    @property
+    def get_last_block(self):
+        """
+        :return: Last block of the blockchain
+        """
+        return self.chain[-1]
+
+    def add_block_to_chain(self, new_block: Block):
+        """
+        Adds a new block to the blockchain
+        :param new_block: Block which will be added to the blockchain
+        """
+        self.chain.append(new_block)
+        print("")
+
+    def add_new_transaction(self, transaction: Transaction):
+        """
+        Adds a transaction to the opened transactions
+        :param transaction: Transaction which will be added to the unprocessed transactions
+        """
+        if self.check_if_transaction_is_valid(transaction):
+            self.open_transactions.append(transaction)
+
+    def check_if_transaction_is_valid(self, transaction: Transaction):
+        if transaction.signature is None:
+            return False
+        return transaction.verify_transaction()
+
+    def hash_transactions(self, transactions: [Transaction]):
+        """
+        Returns a hash of the current opened transactions
+        Hashes each transaction and then build a hash over all hashes
+        :param transactions: List of transactions which should be hashed
+        :return: Hash of the transactions in hex.
+        :rtype: str
+        """
+        hashed_transactions = []
+        for tx in transactions:
+            hashed_transactions.append(tx.hash_transaction().hexdigest())
+        return hashlib.sha256(json.dumps(hashed_transactions).encode('utf-8')).hexdigest()
+
+    def mine_block(self):
+        """
+        Starts to mine a new block.
+        At first, the opened transactions have to be hashed.
+        If the proof of work was successfully the block will be added to the blockchain.
+        Resets the opened transactions.
+        """
+        last_block = self.get_last_block
+        new_block_index = last_block.index + 1
+        new_previous_hash = last_block.hash
+        new_hashed_transaction_root = self.hash_transactions(self.open_transactions)
+
+        # Creates the new block with a references the hash of the current last block of the blockchain
+        # The nonce will be starting at 0
+        new_block = Block(new_block_index,
+                          new_previous_hash,
+                          new_hashed_transaction_root,
+                          self.open_transactions,
+                          0)
+
+        self.proof_of_work(new_block)
+        self.add_block_to_chain(new_block)
+        # reset open transaction
+        self.open_transactions = []
+
+    def proof_of_work(self, block: Block):
+        """
+        Proof of work algorithm. At the moment, there is no difficulty.
+        Increments the nonce until the first position of a hashed block is equal to 00
+        :param block: Block which should be mined
+        """
+        computed_hash = block.hash
+        while not computed_hash.startswith('00'):
+            block.nonce += 1
+            computed_hash = block.hash_block()
+        block.hash = computed_hash
+        return block.nonce
