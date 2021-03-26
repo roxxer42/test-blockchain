@@ -1,7 +1,7 @@
 from unittest import TestCase
 
-from blockchain.client import Client
-from blockchain.transaction import Transaction
+from crypto.blockchain.transaction import Transaction
+from crypto.client.client import Client
 
 
 class TestTransactionSigning(TestCase):

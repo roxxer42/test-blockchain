@@ -1,6 +1,6 @@
-from blockchain.blockchain import Blockchain
-from blockchain.client import Client
-from blockchain.transaction import Transaction
+from crypto.blockchain.blockchain import Blockchain
+from crypto.blockchain.transaction import Transaction
+from crypto.client.client import Client
 
 if __name__ == '__main__':
     # Examples

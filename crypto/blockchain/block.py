@@ -1,7 +1,7 @@
 import hashlib
 from datetime import datetime
 
-from blockchain.transaction import Transaction
+from crypto.blockchain.transaction import Transaction
 
 
 class Block:

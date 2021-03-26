@@ -3,9 +3,9 @@ import json
 
 from Crypto.PublicKey.RSA import RsaKey
 
-from blockchain.block import Block
-from blockchain.client import Client
-from blockchain.transaction import Transaction
+from crypto.blockchain.block import Block
+from crypto.client.client import Client
+from crypto.blockchain.transaction import Transaction
 
 
 class Blockchain:
@@ -48,11 +48,10 @@ class Blockchain:
         :param new_block: Block which will be added to the blockchain
         """
         self.chain.append(new_block)
-        print("")
 
     def add_new_transaction(self, transaction: Transaction):
         """
-        Adds a transaction to the opened transactions
+        Adds a valid transaction to the opened transactions
         :param transaction: Transaction which will be added to the unprocessed transactions
         """
         if transaction.check_if_transaction_is_valid():
