@@ -4,8 +4,8 @@ import json
 from Crypto.PublicKey.RSA import RsaKey
 
 from crypto.blockchain.block import Block
-from crypto.client.client import Client
 from crypto.blockchain.transaction import Transaction
+from crypto.token.token import Token
 
 
 class Blockchain:
@@ -13,9 +13,10 @@ class Blockchain:
     def __init__(self):
         self.open_transactions = []
         self.chain = []
-        self.create_genesis_bock(sender=Client(), recipient=Client())
+        self.token = Token()
+        self.create_genesis_bock(self.token.create_supply_transaction())
 
-    def create_genesis_bock(self, sender: Client, recipient: Client):
+    def create_genesis_bock(self, start_transaction: Transaction):
         """
         Creates a genesis block which will be the first block of the blockchain
         """
@@ -25,11 +26,7 @@ class Blockchain:
         genesis_block_prev_hash = "0000000000000000000000000000000000000000000000000000000000000000"
 
         # Initial transaction because there have to be at least one transaction per block
-        genesis_send_user = sender
-        genesis_receive_user = recipient
-        initial_transaction = Transaction(genesis_send_user.public_key, genesis_receive_user.public_key, 100)
-        initial_transaction.sign_transaction(genesis_send_user.private_key)
-        hashed_transactions = self.hash_transactions([initial_transaction])
+        hashed_transactions = self.hash_transactions([start_transaction])
 
         # Initial nonce
         genesis_block_nonce = 0
@@ -38,7 +35,7 @@ class Blockchain:
             genesis_block_index,
             genesis_block_prev_hash,
             hashed_transactions,
-            [initial_transaction],
+            [start_transaction],
             genesis_block_nonce)
         self.chain.append(genesis_block)
 
