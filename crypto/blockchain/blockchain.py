@@ -51,7 +51,8 @@ class Blockchain:
         Adds a valid transaction to the opened transactions
         :param transaction: Transaction which will be added to the unprocessed transactions
         """
-        if transaction.check_if_transaction_is_valid():
+        if transaction.check_if_transaction_is_valid() and \
+                self.check_balance_of_address(transaction.sender.public_key(), transaction.amount):
             self.open_transactions.append(transaction)
 
     def hash_transactions(self, transactions: [Transaction]):
@@ -104,6 +105,19 @@ class Blockchain:
             computed_hash = block.hash_block()
         block.hash = computed_hash
         return block.nonce
+
+    def check_balance_of_address(self, public_key, amount):
+        """
+        Checks if the balance of an address is enough to perform a transaction
+        :param public_key: Address to check
+        :param amount: Amount to perform a transaction
+        :return: True if balance is enough otherwise False
+        """
+        current_amount = self.get_balance_for_address(public_key)
+        if current_amount >= amount:
+            return True
+        else:
+            return False
 
     def get_balance_for_address(self, public_key: RsaKey):
         """

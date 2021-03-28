@@ -17,10 +17,10 @@ class TestBlockchain(TestCase):
         self.test_block_merkle_root = "ffabff123",
 
         # Test transaction with signing
-        self.send_user_1 = Client()
-        self.receive_user_2 = Client()
-        self.test_block_transaction = Transaction(self.send_user_1.public_key, self.receive_user_2.public_key, 100)
-        self.test_block_transaction.sign_transaction(self.send_user_1.private_key)
+        self.supply_user = self.test_blockchain.token.supply_user
+        self.test_user_1 = Client()
+        self.test_block_transaction = Transaction(self.supply_user.public_key, self.test_user_1.public_key, 100)
+        self.test_block_transaction.sign_transaction(self.supply_user.private_key)
         self.test_block_transaction_list = [self.test_block_transaction]
 
         self.test_block = Block(
@@ -91,12 +91,11 @@ class TestBlockchain(TestCase):
         self.assertTrue(middle_block.timestamp > gen_block.timestamp)
 
         # second block after gensis
-        test_user_1 = Client()
         test_user_2 = Client()
-        new_transaction_1 = Transaction(test_user_1.public_key, test_user_2.public_key, 100)
-        new_transaction_1.sign_transaction(test_user_1.private_key)
-        new_transaction_2 = Transaction(test_user_1.public_key, test_user_2.public_key, 1)
-        new_transaction_2.sign_transaction(test_user_1.private_key)
+        new_transaction_1 = Transaction(self.test_user_1.public_key, test_user_2.public_key, 100)
+        new_transaction_1.sign_transaction(self.test_user_1.private_key)
+        new_transaction_2 = Transaction(self.test_user_1.public_key, test_user_2.public_key, 1)
+        new_transaction_2.sign_transaction(self.test_user_1.private_key)
         self.test_blockchain.add_new_transaction(new_transaction_1)
         self.test_blockchain.add_new_transaction(new_transaction_2)
 
@@ -118,22 +117,28 @@ class TestBlockchain(TestCase):
         new_transaction_0 = Transaction(supply_user.public_key, test_user_1.public_key, 200)
         new_transaction_0.sign_transaction(supply_user.private_key)
 
+        self.test_blockchain.add_new_transaction(new_transaction_0)
+        self.test_blockchain.mine_block()
+
         new_transaction_1 = Transaction(test_user_1.public_key, test_user_2.public_key, 100)
         new_transaction_1.sign_transaction(test_user_1.private_key)
 
         new_transaction_2 = Transaction(test_user_1.public_key, test_user_2.public_key, 10)
         new_transaction_2.sign_transaction(test_user_1.private_key)
 
+        self.test_blockchain.add_new_transaction(new_transaction_1)
+        self.test_blockchain.add_new_transaction(new_transaction_2)
+        self.test_blockchain.mine_block()
+
         new_transaction_3 = Transaction(test_user_2.public_key, test_user_3.public_key, 50)
         new_transaction_3.sign_transaction(test_user_2.private_key)
+
+        self.test_blockchain.add_new_transaction(new_transaction_3)
+        self.test_blockchain.mine_block()
 
         new_transaction_4 = Transaction(test_user_3.public_key, test_user_1.public_key, 20)
         new_transaction_4.sign_transaction(test_user_3.private_key)
 
-        self.test_blockchain.add_new_transaction(new_transaction_0)
-        self.test_blockchain.add_new_transaction(new_transaction_1)
-        self.test_blockchain.add_new_transaction(new_transaction_2)
-        self.test_blockchain.add_new_transaction(new_transaction_3)
         self.test_blockchain.add_new_transaction(new_transaction_4)
         self.test_blockchain.mine_block()
 
@@ -141,3 +146,22 @@ class TestBlockchain(TestCase):
         self.assertEqual(self.test_blockchain.get_balance_for_address(test_user_1.public_key), 110)
         self.assertEqual(self.test_blockchain.get_balance_for_address(test_user_2.public_key), 60)
         self.assertEqual(self.test_blockchain.get_balance_for_address(test_user_3.public_key), 30)
+
+    def test_transaction_with_too_little_balance(self):
+        test_user_1 = Client()
+        test_user_2 = Client()
+
+        new_transaction_1 = Transaction(test_user_1.public_key, test_user_2.public_key, 100)
+        new_transaction_1.sign_transaction(test_user_1.private_key)
+
+        self.assertFalse(self.test_blockchain.check_balance_of_address(new_transaction_1.sender.public_key(),
+                                                                       new_transaction_1.amount))
+
+        supply_user = self.test_blockchain.token.supply_user
+        new_transaction_0 = Transaction(supply_user.public_key, test_user_1.public_key, 200)
+        new_transaction_0.sign_transaction(supply_user.private_key)
+        self.test_blockchain.add_new_transaction(new_transaction_0)
+        self.test_blockchain.mine_block()
+
+        self.assertTrue(self.test_blockchain.check_balance_of_address(new_transaction_1.sender.public_key(),
+                                                                      new_transaction_1.amount))
