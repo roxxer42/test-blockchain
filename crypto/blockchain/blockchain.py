@@ -70,11 +70,15 @@ class Blockchain:
 
     def mine_block(self):
         """
-        Starts to mine a new block.
+        Starts to mine a new block if at least one transaction is in the opened transactions.
         At first, the opened transactions have to be hashed.
         If the proof of work was successfully the block will be added to the blockchain.
         Resets the opened transactions.
         """
+
+        if len(self.open_transactions) == 0:
+            return
+
         last_block = self.get_last_block
         new_block_index = last_block.index + 1
         new_previous_hash = last_block.hash

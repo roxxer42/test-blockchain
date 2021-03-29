@@ -165,3 +165,12 @@ class TestBlockchain(TestCase):
 
         self.assertTrue(self.test_blockchain.check_balance_of_address(new_transaction_1.sender.public_key(),
                                                                       new_transaction_1.amount))
+
+    def test_mine_block_with_no_transactions(self):
+        self.assertEqual(len(self.test_blockchain.chain), 1)
+        self.assertEqual(len(self.test_blockchain.open_transactions), 0)
+
+        self.test_blockchain.mine_block()
+
+        self.assertEqual(len(self.test_blockchain.chain), 1)
+        self.assertEqual(len(self.test_blockchain.open_transactions), 0)
