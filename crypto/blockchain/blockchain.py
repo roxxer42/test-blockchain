@@ -4,6 +4,7 @@ import json
 from Crypto.PublicKey.RSA import RsaKey
 
 from crypto.blockchain.block import Block
+from crypto.blockchain.miner import Miner
 from crypto.blockchain.transaction import Transaction
 from crypto.token.token import Token
 
@@ -14,6 +15,8 @@ class Blockchain:
         self.open_transactions = []
         self.chain = []
         self.token = Token()
+        self.miner = Miner()
+        self.MINING_REWARD = 1
         self.create_genesis_bock(self.token.create_supply_transaction())
 
     def create_genesis_bock(self, start_transaction: Transaction):
@@ -73,7 +76,8 @@ class Blockchain:
         Starts to mine a new block if at least one transaction is in the opened transactions.
         At first, the opened transactions have to be hashed.
         If the proof of work was successfully the block will be added to the blockchain.
-        Resets the opened transactions.
+        Creates a mining reward which will be added to the reset opened transactions.
+        The reward will be processed in the next block. Currently always the same address will get the reward
         """
 
         if len(self.open_transactions) == 0:
@@ -94,8 +98,10 @@ class Blockchain:
 
         self.proof_of_work(new_block)
         self.add_block_to_chain(new_block)
-        # reset open transaction
-        self.open_transactions = []
+        # Creates a reward transaction
+        reward_transaction = self.miner.create_mining_transaction(self.token.supply_user, self.MINING_REWARD)
+        # reset open transaction and adds reward for the next block
+        self.open_transactions = [reward_transaction]
 
     def proof_of_work(self, block: Block):
         """

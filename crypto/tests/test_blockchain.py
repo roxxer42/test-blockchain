@@ -50,7 +50,8 @@ class TestBlockchain(TestCase):
         self.test_blockchain.mine_block()
 
         self.assertEqual(len(self.test_blockchain.chain), 2)
-        self.assertEqual(len(self.test_blockchain.open_transactions), 0)
+        self.assertEqual(len(self.test_blockchain.open_transactions), 1)
+        self.assertEqual(self.test_blockchain.open_transactions[0].amount, 1)
         self.assertEqual(len(self.test_blockchain.get_last_block.transactions), 1)
         self.assertEqual(self.test_blockchain.get_last_block.transactions[0].amount, 100)
 
@@ -87,7 +88,8 @@ class TestBlockchain(TestCase):
         self.assertEqual(middle_block.previous_hash, gen_block.hash)
         self.assertEqual(middle_block.index, 1)
         self.assertEqual(len(middle_block.transactions), 1)
-        self.assertEqual(len(self.test_blockchain.open_transactions), 0)
+        self.assertEqual(len(self.test_blockchain.open_transactions), 1)
+        self.assertEqual(self.test_blockchain.open_transactions[0].amount, 1)
         self.assertTrue(middle_block.timestamp > gen_block.timestamp)
 
         # second block after gensis
@@ -104,7 +106,7 @@ class TestBlockchain(TestCase):
         last_block = self.test_blockchain.get_last_block
         self.assertNotEqual(last_block.hash, middle_block_hash)
         self.assertEqual(last_block.previous_hash, middle_block_hash)
-        self.assertEqual(len(last_block.transactions), 2)
+        self.assertEqual(len(last_block.transactions), 3)
         self.assertEqual(len(self.test_blockchain.chain), 3)
         self.assertTrue(last_block.timestamp > middle_block.timestamp)
 
@@ -142,7 +144,7 @@ class TestBlockchain(TestCase):
         self.test_blockchain.add_new_transaction(new_transaction_4)
         self.test_blockchain.mine_block()
 
-        self.assertEqual(self.test_blockchain.get_balance_for_address(supply_user.public_key), 800)
+        self.assertEqual(self.test_blockchain.get_balance_for_address(supply_user.public_key), 797)
         self.assertEqual(self.test_blockchain.get_balance_for_address(test_user_1.public_key), 110)
         self.assertEqual(self.test_blockchain.get_balance_for_address(test_user_2.public_key), 60)
         self.assertEqual(self.test_blockchain.get_balance_for_address(test_user_3.public_key), 30)
