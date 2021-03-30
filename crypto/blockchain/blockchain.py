@@ -6,14 +6,14 @@ from Crypto.PublicKey.RSA import RsaKey
 from crypto.blockchain.block import Block
 from crypto.blockchain.miner import Miner
 from crypto.blockchain.transaction import Transaction
-from crypto.token.token import Token
+from crypto.blockchain.token import Token
 
 
 class Blockchain:
 
     def __init__(self):
         self.open_transactions = []
-        self.chain = []
+        self.blocks = []
         self.token = Token()
         self.miner = Miner()
         self.MINING_REWARD = 1
@@ -40,14 +40,14 @@ class Blockchain:
             hashed_transactions,
             [start_transaction],
             genesis_block_nonce)
-        self.chain.append(genesis_block)
+        self.blocks.append(genesis_block)
 
     def add_block_to_chain(self, new_block: Block):
         """
         Adds a new block to the blockchain
         :param new_block: Block which will be added to the blockchain
         """
-        self.chain.append(new_block)
+        self.blocks.append(new_block)
 
     def add_new_transaction(self, transaction: Transaction):
         """
@@ -138,7 +138,7 @@ class Blockchain:
         :rtype: int
         """
         balance = 0
-        for block in self.chain:
+        for block in self.blocks:
             for tx in block.transactions:
                 amount = tx.amount
                 if tx.recipient == public_key:
@@ -152,17 +152,17 @@ class Blockchain:
         """
         :return: Last block of the blockchain
         """
-        return self.chain[-1]
+        return self.blocks[-1]
 
     @property
-    def get_full_blockchain(self):
+    def get_all_blocks(self):
         """
         :return: All blocks of the blockchain
         """
-        return self.chain
+        return self.blocks
 
     def get_block_by_index(self, index):
         """
         :return: A specific block of the blockchain by an index
         """
-        return self.chain[index]
+        return self.blocks[index]

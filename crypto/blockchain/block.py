@@ -30,3 +30,18 @@ class Block:
             str(self.nonce).encode('utf-8')
         )
         return h.hexdigest()
+
+    def to_dict(self):
+        dict_transactions = []
+        for tx in self.transactions:
+            dict_transactions.append(tx.to_dict())
+
+        return {
+            "index": self.index,
+            "hash": self.hash,
+            "previous_hash": self.previous_hash,
+            "merkle_root": self.merkle_root,
+            "transactions": dict_transactions,
+            "nonce": self.nonce,
+            "timestamp": str(self.timestamp)
+        }

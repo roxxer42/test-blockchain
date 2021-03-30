@@ -1,10 +1,10 @@
-from crypto.blockchain.blockchain import Blockchain
 from crypto.blockchain.transaction import Transaction
 from crypto.client.client import Client
+from crypto.config.setup import BLOCKCHAIN, NODE
 
 if __name__ == '__main__':
-    # Examples
-    blockchain = Blockchain()
+    blockchain = BLOCKCHAIN
+    NODE.run()
 
     sender = Client()
     receiver = Client()
@@ -17,6 +17,3 @@ if __name__ == '__main__':
 
     balance_sender = blockchain.get_balance_for_address(sender.public_key)
     print(balance_sender)
-
-    print(blockchain.get_block_by_index(0).hash)
-    print(blockchain.get_block_by_index(1).previous_hash)

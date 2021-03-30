@@ -58,3 +58,10 @@ class Transaction:
         new_hash_object = SHA256.new()
         new_hash_object.update(self.encoded_transaction())
         return new_hash_object
+
+    def to_dict(self):
+        return {
+            "sender": str(self.sender.public_key().export_key('DER').hex()),
+            "recipient": str(self.recipient.public_key().export_key('DER').hex()),
+            "amount": self.amount
+        }

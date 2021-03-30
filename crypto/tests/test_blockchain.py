@@ -49,7 +49,7 @@ class TestBlockchain(TestCase):
 
         self.test_blockchain.mine_block()
 
-        self.assertEqual(len(self.test_blockchain.chain), 2)
+        self.assertEqual(len(self.test_blockchain.blocks), 2)
         self.assertEqual(len(self.test_blockchain.open_transactions), 1)
         self.assertEqual(self.test_blockchain.open_transactions[0].amount, 1)
         self.assertEqual(len(self.test_blockchain.get_last_block.transactions), 1)
@@ -107,7 +107,7 @@ class TestBlockchain(TestCase):
         self.assertNotEqual(last_block.hash, middle_block_hash)
         self.assertEqual(last_block.previous_hash, middle_block_hash)
         self.assertEqual(len(last_block.transactions), 3)
-        self.assertEqual(len(self.test_blockchain.chain), 3)
+        self.assertEqual(len(self.test_blockchain.blocks), 3)
         self.assertTrue(last_block.timestamp > middle_block.timestamp)
 
     def test_balance_of_address(self):
@@ -169,10 +169,10 @@ class TestBlockchain(TestCase):
                                                                       new_transaction_1.amount))
 
     def test_mine_block_with_no_transactions(self):
-        self.assertEqual(len(self.test_blockchain.chain), 1)
+        self.assertEqual(len(self.test_blockchain.blocks), 1)
         self.assertEqual(len(self.test_blockchain.open_transactions), 0)
 
         self.test_blockchain.mine_block()
 
-        self.assertEqual(len(self.test_blockchain.chain), 1)
+        self.assertEqual(len(self.test_blockchain.blocks), 1)
         self.assertEqual(len(self.test_blockchain.open_transactions), 0)
